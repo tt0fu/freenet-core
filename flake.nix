@@ -14,6 +14,12 @@
     {
       overlays.default = _: pkgs: {
         freenet = pkgs.callPackage (import ./package.nix) { };
+        freenet-autoupdate = pkgs.writeShellScriptBin "freenet-autoupdate" ''
+          while true; 
+          do 
+              nix run github:freenet/freenet-core#freenet;
+          done
+        '';
       };
     }
     // flake-utils.lib.eachDefaultSystem (
@@ -26,8 +32,8 @@
       in
       {
         packages = rec {
-          inherit (pkgs) freenet;
-          default = freenet;
+          inherit (pkgs) freenet freenet-autoupdate;
+          default = freenet-autoupdate;
         };
       }
     );
