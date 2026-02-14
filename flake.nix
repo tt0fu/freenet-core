@@ -15,9 +15,18 @@
       overlays.default = _: pkgs: {
         freenet = pkgs.callPackage (import ./package.nix) { };
         freenet-autoupdate = pkgs.writeShellScriptBin "freenet-autoupdate" ''
-          while true; 
-          do 
-              nix run github:freenet/freenet-core#freenet;
+          trap "" INT
+
+          while true; do
+              nix run github:freenet/freenet-core#freenet
+              exit_code=$?
+
+              if [ $exit_code -eq 42 ]; then
+                  echo "Autoupdate triggered. Restarting..."
+              else
+                  echo "Non-autoupdate exit code: $exit_code. Stopping."
+                  break
+              fi
           done
         '';
       };
